@@ -62,9 +62,9 @@
 # P9_1  (GND) = Power supply GND
 # P9_2  (GND) = GND on LPD8806 LED strip
 # P9_17 (CS)  = N/A (a SPI pin not used by LPD8806)
-# P9_18 (SI)  = DAT on LDP8806 LED strip (yellow) using a voltage divider
+# P9_18 (SI)  = DAT on LDP8806 LED strip (yellow) <-- Remember to use logic-level translation! BBB is 3V, LPD8806 is 5V.
 # P9_21 (SO)  = N/A (a SPI pin not used by LPD8806)
-# P9_22 (SCK) = CLK on the LDP*806 LED strip (green) using a voltage divider
+# P9_22 (SCK) = CLK on the LDP*806 LED strip (green) <-- Remember to use logic-level translation!
 #
 
 from Adafruit_BBIO.SPI import SPI

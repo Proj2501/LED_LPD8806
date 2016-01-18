@@ -3,7 +3,8 @@
 
 # Python SPI for LPD8806 driven LED strip:
 # JGronowski
-# 2015-12-30
+# First Uploaded: 2015-12-30
+# Last Updated: 2016-01-17
 #
 # Code inspired by:
 # ----------------
@@ -37,30 +38,34 @@
 # ranges from 0x80 0x80 0x80 (all colors off for 1 RGB LED) to
 # 0xFF 0xFF 0xFF (all colors full on making 1 RGB LED turn white). 
 #
-# BBB pin connections:
-# -------------------
-# P9_1  = GND (power supply GND)
-# P9_2  = GND
-# P9_17 = CS  (a SPI pin not used by LPD8806)
-# P9_18 = SI  (the yellow DAT pin)
-# P9_21 = SO  (a SPI pin not used by LPD8806)
-# P9_22 = SCK (the green CLK pin)
-#
 # Hardware Setup:
 # --------------
+# WARNING: Be sure to use logic-level translation on SI (P9_18) and SCK (P9_22),
+# because the LPD8806 appears to have an internal pull-up to 5V on both pins!
 # The 5 meter LED strip that I got from Adafruit came with double power and
-# ground connections (one set connected to the header and the set is loose).
+# ground connections (one set is part of the header and one set is loose).
 # Connect the extra power and GND pins from the LED strip to a barrel jack.
 # https://www.adafruit.com/products/369
-# This will be used to power the LED strip and can be used to power the BBB.
-# Using some addtional wires, connect the strip's terminal to the BBB P9 
-# header pins as above, and optionally connect the DC5V+ pin to the BBB P9_5
-# pin or P9_6 pin which will supply 5V power to the BBB (these are VDD_5V).
-# A 5V 10A power supply from Adafruit is used for the 5 meter strip.
+# The barrel jack can be used to power the LED strip and the BBB.
+# Before plugging the power supply in, use some additional wire to
+# connect the strip's terminal to the BBB P9 header pins as above as
+# described in the below connection list, and optionally connect the DC5V+ pin
+# to the BBB P9_5 pin or P9_6 pin which will supply 5V power to the BBB (these
+# are VDD_5V).  A 5V 10A power supply from Adafruit is used for the 5 meter strip.
 # https://www.adafruit.com/products/658
 # A 5V 2A power supply might be good enough for just 1 meter.  Be careful
 # not to brown out the BBB by turning too many LED's white (all RGB on)
 # at the same time if the power supply cannot provide enough current.
+#
+# BBB pin connections:
+# -------------------
+# P9_1  (GND) = Power supply GND
+# P9_2  (GND) = GND on LPD8806 LED strip
+# P9_17 (CS)  = N/A (a SPI pin not used by LPD8806)
+# P9_18 (SI)  = DAT on LDP8806 LED strip (yellow) using a voltage divider
+# P9_21 (SO)  = N/A (a SPI pin not used by LPD8806)
+# P9_22 (SCK) = CLK on the LDP*806 LED strip (green) using a voltage divider
+#
 
 from Adafruit_BBIO.SPI import SPI
 #import Adafruit_BBIO.GPIO as GPIO
@@ -72,7 +77,7 @@ class LED_LPD8806(object):
   # Constructor
   def __init__(self):
 	self.spi = SPI(0,0) #/dev/spidev1.0  (be sure to run Python with su if 'no permission'
-	self.spi.msh=10000000 #SPI clock set to 10MHz
+	self.spi.msh=1000000 #SPI clock set to 1MHz (slowed from 10MHz for better stability across setups)
 	self.spi.bpw = 8 # bits per word
 	self.spi.threewire = False # not half-duplex
 	self.spi.lsbfirst = False # we want MSB first
